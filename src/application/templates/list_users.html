@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block style_block %}
+<style type="text/css">
+    table.table {
+        width: 80%;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="col-md-7">
+    <h2 id="">All Users</h2>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>CreatedAt</th>
+            <th>Vibration</th>
+            <th>MatchedWith</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+        {% set user_id = user.key.id() %}
+        <tr>
+            <td><a href="#" onclick='var u = {{user.to_dict()|tojson}}; detail(u);'>{{ user_id }}</a></td>
+            <td>{{ user.name }}</td>
+            <td class="nowrap">{{ user.timestamp.strftime('%b %d, %Y %I:%M %p') }}</td>
+            {% if user.vibrate_status %}
+                <td><span class="label label-primary" style="font-size: 14px">On</span></td>
+            {% else %}
+                <td><span class="label label-default" style="font-size: 14px">Off</span></td>
+            {% endif %}
+
+            <td>{{ user.matched_with }}</td>
+            <td>
+                <form method="post" action="{{ url_for('admin_delete_user', user_id=user_id) }}">
+                    <button class="btn btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7">No users yet</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <p>
+        <a class="btn btn-primary" data-toggle="modal" data-target="#new-user-modal">
+            New User
+        </a>
+    </p>
+</div>
+
+<div class="col-md-5">
+    <div class="sidebar" style="padding-left: 20px">
+        <h2 id="">Detail:</h2>
+        {% if users.count() %}
+        <div class="row" style="margin-bottom: 20px">
+            <div class="col-md-4">
+                <img class="d-pic" style="width: 100%"
+                     src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT2JwlmFLmAhtLDggXumqt1lcqIcoVAfmxY53lYz4SuaWztjsZKDQ">
+            </div>
+            <div class="col-md-8">
+                <div class="d-name" style="font-size: 18px; font-weight: bold"></div>
+                <div class="d-gender" style="font-size: 18px; font-weight: bold"></div>
+                <div class="d-gps" style="font-size: 14px;"></div>
+                <div class="d-where" style="font-size: 14px;"></div>
+                <div class="d-fbid" style="font-size: 14px;"></div>
+                <div class="d-bttoken" style="font-size: 14px;"></div>
+            </div>
+        </div>
+        <div><strong>Weight of Features:</strong></div>
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>Experience</th>
+                <th>Life Style</th>
+                <th>Location In a Day</th>
+                <th>Sports</th>
+                <th>Installed Apps</th>
+                <th>Interests</th>
+                <th>Social Ability</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td id="fw-0">0.31</td>
+                <td id="fw-1">-</td>
+                <td id="fw-2">0.55</td>
+                <td id="fw-3">-</td>
+                <td id="fw-4">0.11</td>
+                <td id="fw-5">-</td>
+                <td id="fw-6">-</td>
+            </tr>
+            </tbody>
+        </table>
+        <div style="font-weight: bold">Experience:</div>
+        <div class="d-experience"></div>
+        <div style="font-weight: bold">Life Style:</div>
+        <div class="d-life"></div>
+        <div style="font-weight: bold">Location in a day:</div>
+        <div class="d-location"></div>
+        <div style="font-weight: bold">Sports:</div>
+        <div class="d-sports"></div>
+        <div style="font-weight: bold">Installed Apps:</div>
+        <div class="d-apps"></div>
+        <div style="font-weight: bold">Apps Category:</div>
+        <div class="d-apps-cat"></div>
+        <div style="font-weight: bold">Interests:</div>
+        <div class="d-interests"></div>
+        <div style="font-weight: bold">Social Ability:</div>
+        <div class="d-social"></div>
+        {% endif %}
+    </div>
+</div>
+
+
+{% endblock content %}
+
+{% block footer %}
+{% include 'new_user.html' %} {# pull in new_user form (modal dialog) #}
+{% endblock footer %}
+
+{% block tail_script %}
+<script>
+    var FormHelpers = {
+        validate: function (form, evt) {
+            // Form validation for modal dialog
+            var name = form.find('#name').val();
+            if (!(name)) {
+                evt.preventDefault();
+                Utils.renderFieldErrorTooltip('#name', 'Name is required', 'right');
+            }
+        },
+        init: function () {
+            var self = this;
+            var user_form = $('#new-user-form');
+            user_form.on('submit', function (evt) {
+                self.validate(user_form, evt)
+            });
+        }
+    };
+    $(document).ready(function () {
+        FormHelpers.init();
+    });
+
+    var detail=function(user){
+        $(".d-name").html(user["name"]);
+        $(".d-gender").html(user["gender"]);
+        $(".d-gps").html("now@ " + user["gps"]);
+        $(".d-where").html(user["where"]);
+        $(".d-fbid").html("FacebookID: " + user["facebook_id"]);
+        //$(".d-bttoken").html("Bluetooth: " + user["bluetooth"]);
+        $(".d-pic").attr("src",user["photo_url"]==""?"https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcT2JwlmFLmAhtLDggXumqt1lcqIcoVAfmxY53lYz4SuaWztjsZKDQ":user["photo_url"]);
+        $(".d-experience").html(
+                "&nbsp&nbsphometown: " + user["experience_hometown"] + "<br>"
+                +"&nbsp&nbspeducation:" + user["experience_education"] + "<br>"
+                +"&nbsp&nbspvisited:" + user["experience_tagged_place"] + "<br>"
+                +"&nbsp&nbspjob:" + user["experience_work"]);
+        $(".d-apps").html(user["installed_apps"]);
+        $(".d-apps-cat").html(user["apps_category"]);
+        $(".d-interests").html(
+                "&nbsp&nbspmusic: " + user["interest_music"] + "<br>"
+                +"&nbsp&nbspbook:" + user["interest_book"] + "<br>");
+        var features = JSON.parse(user["features"]);
+        var weights = JSON.parse(user["weights"]);
+        for (var i=0; i<7; i++) {
+            if(features.indexOf(i) >= 0){
+                var num = new Number(weights[i]);
+                $("#fw-" + i).html(num.toFixed(2));
+            }
+            else {
+                $("#fw-" + i).html("-");
+            }
+        }
+    };
+</script>
+{% endblock tail_script %}
