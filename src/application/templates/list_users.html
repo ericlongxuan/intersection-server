@@ -29,7 +29,7 @@
         <tr>
             <td><a href="#" onclick='var u = {{user.to_dict()|tojson}}; detail(u);'>{{ user_id }}</a></td>
             <td>{{ user.name }}</td>
-            <td class="nowrap">{{ user.timestamp.strftime('%b %d, %Y %I:%M %p') }}</td>
+            <td class="nowrap">{{ user.timestamp.strftime('%b %d, %H:%M') }}</td>
             {% if user.vibrate_status %}
                 <td><span class="label label-primary" style="font-size: 14px">On</span></td>
             {% else %}
@@ -80,12 +80,12 @@
             <thead>
             <tr>
                 <th>Experience</th>
-                <th>Life Style</th>
-                <th>Location In a Day</th>
-                <th>Sports</th>
+                <th>Hobby</th>
                 <th>Installed Apps</th>
-                <th>Interests</th>
-                <th>Social Ability</th>
+                <th>Daily Locations</th>
+                <th>Sociability</th>
+                <th>Sports</th>
+                <th>Lifestyle</th>
             </tr>
             </thead>
             <tbody>

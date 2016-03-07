@@ -11,6 +11,7 @@ class UserCreate(View):
     def dispatch_request(self):
         res = {}
         info = request.json
+        #return json.dumps(info)
         try:
             #facebook_id = info["FacebookID"]
             # existed_user = UserModel.query().filter("facebook_id = ", facebook_id)
@@ -23,11 +24,11 @@ class UserCreate(View):
             tagged_places = [p["place"]["location"]["city"] for p in fb_info["tagged_places"]["data"]] if fb_info["tagged_places"] else []
             tagged_places = list(set(tagged_places))
             installed_app = []
-            apps_category = {"Tools":0, "Music & Audio":0, "Finance":0, "Communication":0}
+            apps_cat = {"Tools":0, "Music & Audio":0, "Finance":0, "Communication":0}
             for app in info["app"]["apps"]:
-                if app["category"] in apps_category:
+                if app["category"] in apps_cat:
                     installed_app.append(app["title"])
-                    apps_category[app["category"]] += 1
+                    apps_cat[app["category"]] += 1
             user = UserModel(
                 name=fb_info["name"],
                 gender=fb_info["gender"],
@@ -37,15 +38,15 @@ class UserCreate(View):
                 photo_url=info["photo URL"],
                 facebook_token=info["AccessToken"],
                 gps="",
-                experience_education=",".join([s["school"]["name"] for s in fb_info["education"]]),
+                experience_education="[" + ",".join([s["school"]["name"] for s in fb_info["education"]]) + "]",
                 experience_hometown="" if "name" not in fb_info["hometown"] else fb_info["hometown"]["name"],
-                experience_work=",".join([w["employer"]["name"] for w in fb_info["work"]]),
+                experience_work="[" + ",".join([w["employer"]["name"] for w in fb_info["work"]]) + "]",
                 experience_tagged_place=",".join(tagged_places),
-                interest_music=",".join([m["name"] for m in fb_info["music"]["data"]]),
-                interest_book=",".join([b["name"] for b in fb_info["books"]["data"]]),
+                interest_music="[" + ",".join([m["name"] for m in fb_info["music"]["data"]]) + "]",
+                interest_book="[" + ",".join([b["name"] for b in fb_info["books"]["data"]]) + "]",
                 #installed_apps=json.dumps(apps),
                 installed_apps=json.dumps(installed_app),
-                apps_category=json.dumps(apps_category),
+                apps_category=json.dumps(apps_cat),
                 vibrate_status=False,
                 matched_with=None
             )

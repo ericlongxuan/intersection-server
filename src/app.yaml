@@ -19,6 +19,8 @@ libraries:
   version: "0.15"
 - name: ssl
   version: latest
+- name: numpy
+  version: "1.6.1"
 
 inbound_services:
 - warmup

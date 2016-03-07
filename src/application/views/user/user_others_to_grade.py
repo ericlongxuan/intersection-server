@@ -13,6 +13,7 @@ import json
 class UseOthersToGrade(View):
     def dispatch_request(self, user_id, count):
         my_key = ndb.Key("UserModel", int(user_id))
+        user = my_key.get()
         others = []
         if UserModel.query().count() <= 1:
             return json.dumps(others)
@@ -28,7 +29,8 @@ class UseOthersToGrade(View):
             other_dic = {}
             other_dic["user_id"] = other.key.id()
             other_dic["photo_url"] = other.photo_url
-            other_dic["similarities"] = [random.randrange(1,10) for i in range(7)]
+            #other_dic["similarities"] = [random.randrange(1,11) for i in range(7)]
+            other_dic["similarities"] = user.cal_sim(other)
             others.append(other_dic)
         return json.dumps(others)
 

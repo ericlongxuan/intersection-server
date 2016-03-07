@@ -20,7 +20,9 @@ from application.views.user.user_has_matched import UserHasMatched
 from application.views.user.user_upload_gps import UserUploadGps
 from application.views.user.user_set_features import UserSetFeatures
 from application.views.user.user_others_to_grade import UseOthersToGrade
-
+from application.views.user.user_set_willing import UserSetWilling
+from application.views.user.user_update_audio import UserUpdateAudio
+from application.views.user.user_grade_other import UserGradeOther
 
 # URL dispatch rules
 
@@ -38,6 +40,9 @@ app.add_url_rule('/is_matched/<user_id>', 'user_has_matched', view_func=UserHasM
 app.add_url_rule('/others_to_grade/<user_id>/<count>', 'user_others_to_grade', view_func=UseOthersToGrade.as_view('user_others_to_grade'))
 app.add_url_rule('/upload_gps/<user_id>/<gps>', 'user_upload_gps', view_func=UserUploadGps.as_view('user_upload_gps'), methods=['GET', 'POST'])
 app.add_url_rule('/set_features/<user_id>/<features>', 'user_set_features', view_func=UserSetFeatures.as_view('user_set_features'))
+app.add_url_rule('/set_willing/<user_id>/<willing>', 'user_set_willing', view_func=UserSetWilling.as_view('user_set_willing'))
+app.add_url_rule('/update_audio/<user_id>/<speech_percent>', 'user_update_audio', view_func=UserUpdateAudio.as_view('user_update_audio'))
+app.add_url_rule('/grade_other/<user_id>/<other_id>/<grading>', 'grade_other', view_func=UserGradeOther.as_view('grade_other'))
 
 app.add_url_rule('/admin/users', 'admin_list_users', view_func=AdminListUsers.as_view('admin_list_users'), methods=['GET', 'POST'])
 app.add_url_rule('/admin/delete_user/<user_id>', 'admin_delete_user', view_func=AdminDeleteUser.as_view('admin_delete_user'), methods=['POST'])

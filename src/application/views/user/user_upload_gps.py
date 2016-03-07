@@ -18,22 +18,32 @@ class UserUploadGps(View):
             # Look up an address with reverse geocoding
             reverse_geocode_result = gmaps.reverse_geocode(gps)
 
-            types = ["food", "gym", "cafe", "book_store", "health", "shopping_mall", "library", "park", "university"]
+            types = {"food":1, "gym":2, "cafe":3, "book_store":4, "health":5, "shopping_mall":6, "library":7, "park":8, "university":9}
 
-            places = gmaps.nearest(gps, types=types)
+            places = gmaps.nearest(gps, types=types.keys())
 
             res = {}
+            location_type_index = 0 #unknown
+            res["location_type"] = "unknown"  #unknown
             if places and len(places["results"]) > 0:
                 for t in places["results"][0]["types"]:
-                    if t in types:
+                    if t in types.keys():
                         res["location_type"] = t
+                        location_type_index = types[t]
 
             user = UserModel.get_by_id(int(user_id))
             user.where = reverse_geocode_result[0]["formatted_address"]
             user.gps = gps + ": " + res["location_type"]
+
+            if user.locations is None:
+                user.locations = str(location_type_index)
+            elif len(user.locations) < 12 * 24:
+                user.locations += str(location_type_index)
+            else:
+                user.locations = user.locations[1:] + str(location_type_index)
             user.put()
         except Exception as e:
-            return json.dumps(places["results"])
+            return json.dumps(places["results"]) + e.message
 
-
+        res["locations"] = user.locations
         return json.dumps(res)
